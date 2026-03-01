@@ -26,13 +26,12 @@ const userSchema=new Schema({
     refreshToken:{
         type:String,
     }
-});
+},{timestamps:true});
 
-userSchema.pre("save",async function(next){
-    if(!this.isModified("password")) return next();
+userSchema.pre("save",async function(){
+    if(!this.isModified("password")) return ;
     const hashPassword=await bcrypt.hash(this.password,10);
     this.password=hashPassword;
-    next();
 });
 
 userSchema.methods.GenerateRefreshToken=async function(){
