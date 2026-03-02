@@ -34,7 +34,7 @@ userSchema.pre("save",async function(){
 });
 
 userSchema.methods.GenerateRefreshToken=async function(){
-    const refreshToken=jwt.sign({_id:this._id},process.env.JWT_REFRESH_SECRET,{expiresIn:"7d"});
+    const refreshToken=await jwt.sign({_id:this._id},process.env.JWT_REFRESH_SECRET,{expiresIn:"7d"});
     this.refreshToken=refreshToken;
     return refreshToken;
 };
@@ -42,6 +42,11 @@ userSchema.methods.GenerateRefreshToken=async function(){
 userSchema.methods.ComparePassword=async function(password){
     return await bcrypt.compare(password,this.password);
 }
+
+userSchema.methods.VerifyRefreshToken=async function(refreshToken){
+    const decode=await jwt.verify(refreshToken,process.env.jwt_REFRESH_SECRET);
+    return decode;
+};
 
 const UserModel=mongoose.model("user",userSchema);
 
