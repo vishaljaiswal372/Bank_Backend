@@ -22,11 +22,17 @@ const accountSchema=new Schema({
         type:String,
         required:[true,"Account Photo is required"],
     },
-    UniqueIdNumber:{
+    UID:{
         type:String,
         required:[true,"Account Unique ID Number is required"],
         minlength:[16,"Unique ID Number must be at least 16 characters"],
-    }
+    },
+    password:{
+        type:String,
+        required:[true,"Account Password is required"],
+        lowercase:true,
+        trim:true,
+    },
 },{timestamps:true});
 
 const AccountModel=mongoose.model("account",accountSchema);
