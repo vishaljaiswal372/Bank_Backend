@@ -2,7 +2,7 @@ import {Router} from 'express';
 import { createAccount, 
     getAccountDetails } from '../controllers/account.controller.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
-import upload from '../middlewares/upload.middleware.js';
+import upload from '../middlewares/multer.middleware.js';
 
 const AccountRouter=Router();
 

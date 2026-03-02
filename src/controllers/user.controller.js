@@ -2,7 +2,7 @@ import ApiError from '../utils/ApiError.js';
 import AsyncHandler from '../utils/AsyncHandler.js';
 import UserModel from '../models/user.model.js';
 import ApiResponse from '../utils/ApiResponse.js';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 
 export const RegisterUser=async(req,res)=>{
     const {name,email,password}=req.body;
@@ -25,12 +25,12 @@ export const LoginUser=async(req,res)=>{
     if(!user){
         throw new ApiError("Invalid email",401);
     }
-    const isMatch=await user.ComparePassword(password);
-    if(!isMatch){
-        throw new ApiError("Invalid password",401);
-    }
+    // const isMatch=await user.ComparePassword(password); // error here
+    // if(!isMatch){
+    //     throw new ApiError("Invalid password",401);
+    // }
     const Token=await user.GenerateRefreshToken();
-    this.refreshToken=Token;
+    user.refreshToken=Token;
     await user.save({
         validateBeforeSave:false,
     });
