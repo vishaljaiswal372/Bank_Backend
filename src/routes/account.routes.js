@@ -1,5 +1,6 @@
 import {Router} from 'express';
-import { createAccount, getAccountDetails } from '../controllers/account.controller.js';
+import { createAccount, 
+    getAccountDetails } from '../controllers/account.controller.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
 import upload from '../middlewares/upload.middleware.js';
 
