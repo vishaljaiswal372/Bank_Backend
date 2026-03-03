@@ -2,6 +2,8 @@ import AccountModel from "../models/Account.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import uploadToCloudinary from "../utils/Cloudinary.js";
+import TransactionModel from "../models/transaction.model.js";
+import LedgerModel from "../models/ledger.model.js";
 
 
 export const createAccount=async(req,res)=>{
@@ -67,4 +69,18 @@ export const getAccountDetails=async(req,res)=>{
         throw new ApiError("Account not found for this user",404,null,"/src/controllers/account.controller.js getAccountDetails end point");
     }
     return res.status(200).json(new ApiResponse("Account details retrieved successfully",200,account));
+};
+
+export const transactionAmount=async(req,res)=>{
+    const {from,to,amount,UniqueIdentifier}=req.body;
+    if(!from){
+        throw new ApiError("Sender Account ID is required",400,null,"/src/controllers/account.controller.js transactionAmount end point");
+    }
+    if(!to){
+        throw new ApiError("Receiver Account ID is required",400,null,"/src/controllers/account.controller.js transactionAmount end point");
+    }
+    if(!amount){
+        throw new ApiError("Transaction Amount is required",400,null,"/src/controllers/account.controller.js transactionAmount end point");
+    }
+    
 };

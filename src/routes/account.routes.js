@@ -1,6 +1,6 @@
 import {Router} from 'express';
 import { createAccount, 
-    getAccountDetails } from '../controllers/account.controller.js';
+    getAccountDetails, transactionAmount } from '../controllers/account.controller.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
 import upload from '../middlewares/multer.middleware.js';
 
@@ -16,6 +16,8 @@ AccountRouter.post('/createAccount',authMiddleware,upload.fields([{
 ]),createAccount);
 
 AccountRouter.get('/accountDetails',authMiddleware,getAccountDetails);
+
+AccountRouter.post('/transaction',authMiddleware,transactionAmount);
 
 
 

@@ -20,6 +20,9 @@ const transactionSchema=new Schema({
     amount:{
         type:Number,
         required:[true,"Transaction Amount is required"],
+    },
+    success:{
+        type:Boolean,
     }
 },{timestamps:true});
 
