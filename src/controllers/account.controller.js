@@ -71,7 +71,7 @@ export const getAccountDetails=async(req,res)=>{
     return res.status(200).json(new ApiResponse("Account details retrieved successfully",200,account));
 };
 
-export const transactionAmount=async(req,res)=>{
+export const AmountTransaction=async(req,res)=>{
     const {from,to,amount,UniqueIdentifier}=req.body;
     if(!from){
         throw new ApiError("Sender Account ID is required",400,null,"/src/controllers/account.controller.js transactionAmount end point");
@@ -82,5 +82,42 @@ export const transactionAmount=async(req,res)=>{
     if(!amount){
         throw new ApiError("Transaction Amount is required",400,null,"/src/controllers/account.controller.js transactionAmount end point");
     }
-    
+    const isExist=await TransactionModel.findOne({UniqueIdentifier})
+    if(isExist){
+        throw new ApiError("Transaction with this Unique Identifier already exists",400,null,"/src/controllers/account.controller.js transactionAmount end point");
+    }
+    const session=await mongoose.startSession();
+    session.startTransaction();
+    let transaction;
+    try {
+        transaction=await TransactionModel.create({
+            from,
+            to,
+            amount,
+            UniqueIdentifier,
+        },{session});
+
+        const LedgerFromUserEntry=await LedgerModel.create({
+            accountId:from,
+            type:"debit",
+            amount:amount,
+        },{session});
+
+        const LedgerToUserEntry=await LedgerModel.create({
+            accountId:to,
+            type:"credit",
+            amount:amount,
+        },{session});
+
+        await session.commitTransaction();
+        await session.endSession();
+    } catch (error) {
+        await session.abortTransaction();
+        await session.endSession();
+        throw new ApiError("Failed to create transaction",500,null,"/src/controllers/account.controller.js transactionAmount end point");   
+    }
+    transaction.CompletionStatus=true;
+    return res.status(201).json(
+        new ApiResponse("Transaction completed successfully",201,transaction)
+    );
 };
