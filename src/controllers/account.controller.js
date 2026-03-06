@@ -86,6 +86,10 @@ export const AmountTransaction=async(req,res)=>{
     if(isExist){
         throw new ApiError("Transaction with this Unique Identifier already exists",400,null,"/src/controllers/account.controller.js transactionAmount end point");
     }
+    let balance=await FetchBalance(req, res);
+    if(balance.data < amount){
+        throw new ApiError("Insufficient balance for this transaction",400,null,"/src/controllers/account.controller.js transactionAmount end point");
+    }
     const session=await mongoose.startSession();
     session.startTransaction();
     let transaction;
@@ -120,4 +124,25 @@ export const AmountTransaction=async(req,res)=>{
     return res.status(201).json(
         new ApiResponse("Transaction completed successfully",201,transaction)
     );
+};
+
+export const FetchBalance=async(req,res)=>{
+    const userId=req.userId;
+    if(!userId){
+        throw new ApiError("User ID is required",400,null,"/src/controllers/account.controller.js FetchBalance end point at line number 128");
+    }
+    const account=await AccountModel.findOne({userId});
+    if(!account){
+        throw new ApiError("Account not found for this user",404,null,"/src/controllers/account.controller.js FetchBalance end point at line number 134");
+    }
+    const LedgerEntries=await LedgerModel.find({accountId:account._id});
+    if(LedgerEntries.length===0){
+        return res.status(200).json(new ApiResponse("Account balance retrieved successfully",200,0));
+    }
+    let balance=0;
+    for(let it of LedgerEntries){
+        if(it.type==="credit") balance+=it.amount;
+        else balance-=it.amount;
+    }
+    return res.status(200).json(new ApiResponse("Account balance retrieved successfully",200,balance));
 };
